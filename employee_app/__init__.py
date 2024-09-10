@@ -4,8 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'default_password') 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://avnadmin:{DB_PASSWORD}@pg-2eade052-kishore88-20d6.c.aivencloud.com:14147/defaultdb?sslmode=require"  # Default for development
+DB_PASSWORD = os.getenv('DB_PASSWORD', 'default_password')
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://avnadmin:{DB_PASSWORD}@pg-2eade052-kishore88-20d6.c.aivencloud.com:14147/defaultdb?sslmode=require"  # Default for development
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy()  # Initialize without the app

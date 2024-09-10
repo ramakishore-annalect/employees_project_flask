@@ -51,10 +51,10 @@ def webhook():
     challenge_value = request.headers.get('Smartsheet-Hook-Challenge')
     if challenge_value:
         response = {
-            'Smartsheet-Hook-Response': challenge_value
+            'smartsheetHookResponse': challenge_value
         }
         print("this is the response from the webhook", response)
-        return response, 200
+        return jsonify(response), 200
     data = request.get_json()
     print("Received data: ", data)
     return 'Webhook received', 200

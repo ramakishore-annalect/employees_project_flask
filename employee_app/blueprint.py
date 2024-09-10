@@ -48,11 +48,12 @@ def delete_employee_details(employee_id):
 
 @employee_bp.route('/webhook', methods=['POST'])
 def webhook():
-    if 'Smartsheet-Hook-Challenge' in request.headers:
-        # Respond to the verification request
-        challenge = request.headers['Smartsheet-Hook-Challenge']
-        print("----->>>>", challenge)
-        return jsonify({'Smartsheet-Hook-Response': challenge}), 200
+    challenge_value = request.headers.get('Smartsheet-Hook-Challenge')
+    if challenge_value:
+        response = {
+            'Smartsheet-Hook-Response': challenge_value
+        }
+        return jsonify(response), 200
     data = request.get_json()
     print("Received data: ", data)
-    return jsonify({'status': 'success'}), 200
+    return 'Webhook received', 200

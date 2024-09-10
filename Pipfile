@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+sqlalchemy = "*"
+marshmallow = "*"
+psycopg2-binary = "*"
+flask-sqlalchemy = "*"
+marshmallow-sqlalchemy = "*"
+pytest-mock = "*"
+
+[dev-packages]
+pytest = "*"
+pytest-mock = "*"
+
+[requires]
+python_version = "3.9"

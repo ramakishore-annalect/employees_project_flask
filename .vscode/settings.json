@@ -1,0 +1,9 @@
+{
+    "editor.fontSize": 18,
+    "editor.fontFamily": "Fira Code Retina",
+    "python.testing.pytestArgs": [
+        "employee_app"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}

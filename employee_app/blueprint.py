@@ -51,6 +51,7 @@ def webhook():
     if 'smartsheetHookChallenge' in request.headers:
         # Respond to the verification request
         challenge = request.headers['smartsheetHookChallenge']
+        print("----->>>>", challenge)
         return jsonify({'smartsheetHookResponse': challenge}), 200
     data = request.json
     print(data)

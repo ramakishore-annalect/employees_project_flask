@@ -53,6 +53,7 @@ def webhook():
         response = {
             'Smartsheet-Hook-Response': challenge_value
         }
+        print("this is the response from the webhook", response)
         return jsonify(response), 200
     data = request.get_json()
     print("Received data: ", data)

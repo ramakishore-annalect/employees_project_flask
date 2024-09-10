@@ -1,1 +1,1 @@
-web: python employees_project_flask/employee_app/__init__.py
+web: gunicorn employees_project_flask/employee_app/__init__.py:app

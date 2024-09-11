@@ -3,6 +3,7 @@ from employee_app import db
 from employee_app.models import Employee
 from employee_app.schema import EmployeeSchema
 from lib.helper_functions import get_employee_by_id, add_employee, update_employee, delete_employee
+from lib.smartsheet_helper import SmartsheetJSONUpdater
 
 employee_bp = Blueprint('employee', __name__)
 employee_schema = EmployeeSchema() 
@@ -25,6 +26,10 @@ def get_employee(employee_id):
 def create_employee():
     data = request.get_json()
     new_employee = add_employee(data)
+    updater = SmartsheetJSONUpdater(
+        "Bearer pqV7wjSQtvkrqsOo2XGUYv81PklwmHMAt86o4"
+    )  # remove token once tested.
+    updater.update_from_json(data, "updated_Campaigns", "teams_user")
     return employee_schema.jsonify(new_employee), 201
 
 @employee_bp.route('/<int:employee_id>', methods=['PUT'])

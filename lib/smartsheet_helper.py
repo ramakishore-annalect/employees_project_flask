@@ -1,5 +1,6 @@
 import smartsheet
 import json
+import requests
 import logging
 from pathlib import Path
 
@@ -87,7 +88,7 @@ class SmartsheetJSONUpdater:
         self.logger.info("Starting Smartsheet update process")
 
         try:
-            
+
             print(f"Reading JSON file or dictionary: {json_data}")
             # with open(json_path, "r") as json_file:
             #    json_data = json.load(json_file)
@@ -131,3 +132,77 @@ class SmartsheetJSONUpdater:
         except Exception as e:
             self.logger.error(f"Unexpected error: {e}")
             self.logger.error("Full traceback:", exc_info=True)
+
+
+class SmartsheetEventProcessor:
+    def __init__(self, api_token, sheet_id):
+        self.api_token = api_token
+        self.base_url = "https://api.smartsheet.com/2.0"
+        self.sheet_id = sheet_id
+        self.headers = {
+            "Authorization": f"Bearer {self.api_token}",
+            "Content-Type": "application/json",
+        }
+
+    def get_row_details(self, row_id):
+        """Fetch details for a specific row in the sheet."""
+        url = f"{self.base_url}/sheets/{self.sheet_id}/rows/{row_id}"
+        response = requests.get(url, headers=self.headers)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(f"Failed to get row details: {response.status_code}, {response.text}")
+            return None
+
+    def get_column_details(self, column_id):
+        """Fetch details for a specific column in the sheet."""
+        url = f"{self.base_url}/sheets/{self.sheet_id}/columns/{column_id}"
+        response = requests.get(url, headers=self.headers)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print(
+                f"Failed to get column details: {response.status_code}, {response.text}"
+            )
+            return None
+
+    def get_cell_value(self, row_details, column_id):
+        """Fetch the updated cell value from the row details based on the column ID."""
+        for cell in row_details.get("cells", []):
+            if cell.get("columnId") == column_id:
+                return cell.get("value")
+        return None
+
+    def get_updated_values(self, events):
+        """Fetch updated values from the events and return as a dictionary with column names as keys."""
+        updated_values = {}
+
+        for event in events:
+            if event["objectType"] == "cell" and event["eventType"] in [
+                "updated",
+                "created",
+            ]:
+                row_id = event["rowId"]
+                column_id = event["columnId"]
+
+                # Fetch row details
+                row_details = self.get_row_details(row_id)
+                if not row_details:
+                    continue
+
+                # Fetch column details (to get the column name)
+                column_details = self.get_column_details(column_id)
+                if not column_details:
+                    continue
+                column_name = column_details.get("title")
+
+                # Fetch the updated or created cell value from the row
+                updated_value = self.get_cell_value(row_details, column_id)
+
+                # Add to the dictionary
+                if column_name and updated_value is not None:
+                    updated_values[column_name] = updated_value
+
+        return updated_values

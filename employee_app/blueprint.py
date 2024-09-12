@@ -1,9 +1,10 @@
+import os
 from flask import Blueprint, jsonify, request
 from employee_app import db
 from employee_app.models import Employee
 from employee_app.schema import EmployeeSchema
 from lib.helper_functions import get_employee_by_id, add_employee, update_employee, delete_employee
-from lib.smartsheet_helper import SmartsheetJSONUpdater
+from lib.smartsheet_helper import SmartsheetJSONUpdater, SmartsheetEventProcessor
 
 employee_bp = Blueprint('employee', __name__)
 employee_schema = EmployeeSchema() 
@@ -27,8 +28,8 @@ def create_employee():
     data = request.get_json()
     new_employee = add_employee(data)
     updater = SmartsheetJSONUpdater(
-        "Bearer pqV7wjSQtvkrqsOo2XGUYv81PklwmHMAt86o4"
-    )  # remove token once tested.
+        os.environ.get('API_TOKEN')
+    )
     updater.update_from_json(data, "updated_Campaigns", "teams_user")
     return employee_schema.jsonify(new_employee), 201
 
@@ -62,4 +63,8 @@ def webhook():
         return jsonify(response), 200
     data = request.get_json()
     print("Received data: ", data)
+    smartsheet_processor = SmartsheetEventProcessor(os.environ.get('API_TOKEN'), data["scopeObjectId"])
+    updated_values = smartsheet_processor.get_updated_values(data["events"])
+    print("Updated values:", updated_values)
+    
     return 'Webhook received', 200
